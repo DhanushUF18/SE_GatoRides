@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import RouteConfig from './routes/routes';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom'
 import NavBar from './components/NavBar';
 import './styles.css'; 
 

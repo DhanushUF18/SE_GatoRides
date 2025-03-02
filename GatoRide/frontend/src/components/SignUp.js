@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles.css';
-import OpenStreetMapSearch from './OpenStreetMapSearch';
+import OpenStreetMapSearch from './OpenStreetMap';
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
