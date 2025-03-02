@@ -29,6 +29,7 @@ const Dashboard = () => {
       )}
       <button onClick={logoutHandler}>Logout</button>
     </div>
+    
   );
 };
 
