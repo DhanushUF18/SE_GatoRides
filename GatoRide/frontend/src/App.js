@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import RouteConfig from './routes/routes';
 import { useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar';
