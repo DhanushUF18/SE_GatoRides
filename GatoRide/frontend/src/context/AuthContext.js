@@ -1,14 +1,11 @@
-import React, { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { login, signup, verifyEmail } from "../services/AuthService";
+import React, { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login, signup, verifyEmail } from '../services/AuthService';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    // ✅ Load user from localStorage on startup
-    return JSON.parse(localStorage.getItem("user")) || null;
-  });
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -31,77 +28,62 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogin = async (email, password) => {
     try {
-      const credentials = {email,password};
-      const response = await fetch("http://localhost:5001/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-      console.log("Login Response:", data); // ✅ Debugging
-
-      if (response.ok && data.user) {
-        setUser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user)); // ✅ Save user in localStorage
-        navigate("/"); // ✅ Redirect to Home (Dashboard)
-      } else {
-        throw new Error(data.message || "Login failed");
-      }
+      const loginData = {
+        email: email,
+        password: password
+      };
+      const response = await login(loginData);
+      setUser(response.user);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      navigate('/dashboard');
     } catch (error) {
-      console.error("Login error:", error.message);
+      console.error(error);
     }
   };
 
-  // ✅ Handle Signup Correctly
   const handleSignup = async (name, email, username, password) => {
     try {
-      const userData = { name, email, username, password };
-      const response = await signup(userData); // ✅ Ensure signup function correctly sends JSON
-
-      if (response.ok) {
-        alert("Signup successful! Please check your email for verification.");
-        navigate("/login");
-      } else {
-        throw new Error(response.message || "Signup failed");
-      }
+      const userData = {
+        name: name,
+        email: email,
+        username: username,
+        password: password
+      };
+  
+      await signup(userData); // Ensure signup function correctly sends JSON
+      navigate('/login');
     } catch (error) {
-      console.error("Signup Error:", error.message);
+      console.error("Signup Error:", error);
     }
   };
+  
 
-  // ✅ Verify Email & Update User State
   const handleVerifyEmail = async (token) => {
     try {
       await verifyEmail(token);
-      const updatedUser = { ...user, verified: true };
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      alert("Email verified successfully!");
-      navigate("/login");
+      setUser({ ...user, verified: true });
+      localStorage.setItem('user', JSON.stringify({ ...user, verified: true }));
+      navigate('/login');
     } catch (error) {
-      console.error("Verification Error:", error.message);
+      console.error(error);
     }
   };
 
-  // ✅ Handle Logout
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem("user");
-    navigate("/"); // ✅ Redirect to Home page after logout
+    localStorage.removeItem('user');
+    navigate('/');
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        handleLogin,
-        handleSignup,
-        handleVerifyEmail,
-        handleLogout,
-      }}
-    >
+    <AuthContext.Provider value={{
+      user,
+      loading,
+      handleLogin,
+      handleSignup,
+      handleVerifyEmail,
+      handleLogout
+    }}>
       {children}
     </AuthContext.Provider>
   );
