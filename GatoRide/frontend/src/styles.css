@@ -1,78 +1,154 @@
 /* Global styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #121212;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+/* Container styles */
+.container {
+  background: #1e1e1e;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: 20px auto;
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Form styles */
+form {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  margin: auto;
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+}
+
+input::placeholder {
+  color: #bbb;
+}
+
+/* Button styles */
+button, .btn {
+  background: #ff9800;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  margin: 5px;
+}
+
+button:hover, .btn:hover {
+  background: #ff5722;
+}
+
+/* Home page */
+.home-container {
+  margin-top: 50px;
+  min-height: 100vh;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.home-content {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.home-buttons {
+  margin-top: 20px;
+}
+.page-container {
+  min-height: 100vh;
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: hidden;
+  position: fixed;
+}
+
+.home-background {
+  background-image: url('../public/images/background.jpg');
   
-  /* Container styles */
-  .container {
-    background: #1e1e1e;
-    padding: 30px;
-    border-radius: 10px;
-    max-width: 500px;
-    margin: 20px auto;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
-  }
-  
-  /* Form styles */
-  form {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 400px;
-    margin: auto;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
-  }
-  
-  input {
-    width: 90%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: white;
-  }
-  
-  input::placeholder {
-    color: #bbb;
-  }
-  
-  /* Button styles */
-  button, .btn {
-    background: #ff9800;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s;
-    text-decoration: none;
-    display: inline-block;
-    margin: 5px;
-  }
-  
-  button:hover, .btn:hover {
-    background: #ff5722;
-  }
-  
-  /* Home page */
-  .home-container {
-    margin-top: 50px;
-  }
-  
-  .home-content {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    display: inline-block;
-  }
-  
-  .home-buttons {
-    margin-top: 20px;
-  }
-  
+}
+
+.signup-background {
+  background-image: url('../public/images/background.jpg');
+}
+
+.dashboard-background {
+  background-image: url('../public/images/background.jpg');
+}
+
+.login-background {
+  background-image: url('../public/images/background.jpg');
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: transparent;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar-brand {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.nav-logo {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-item {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  font-size: 1.2rem;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

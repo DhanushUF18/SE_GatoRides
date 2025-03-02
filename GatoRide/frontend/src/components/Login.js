@@ -43,7 +43,7 @@ import '../styles.css';  // Import the global styles
   // };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} >
       <h2>Login to GatoRides</h2>
       <p>Access your ride-sharing account.</p>
       <input type="email" name="email" placeholder="Email" onChange={handleChange} required />

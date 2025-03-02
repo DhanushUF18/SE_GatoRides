@@ -71,7 +71,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Userhgjgv created. Verify your email."})
+	json.NewEncoder(w).Encode(map[string]string{"message": "User created. Verify your email."})
 }
 
 // Verify Email
