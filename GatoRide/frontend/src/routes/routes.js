@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }) => {
 const RouteConfig = [
   {
     path: "/",
-    component: Home, // Home component will now include Dashboard content
+    component: Home, 
     exact: true,
   },
   {
@@ -28,6 +28,10 @@ const RouteConfig = [
   {
     path: "/login",
     component: Login,
+  },
+  {
+    path:"/",
+    component: Dashboard
   },
   {
     path: "/verify-email/:token",
