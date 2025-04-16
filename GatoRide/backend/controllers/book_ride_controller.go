@@ -1,5 +1,3 @@
-// book_controller.go (updated with booking alerts)
-
 package controllers
 
 import (
@@ -7,14 +5,13 @@ import (
 	"backend/models"
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// BookRide - Request a ride by adding a booking alert
+// BookRide - Request a ride directly without requiring driver confirmation
 func BookRide(c *gin.Context) {
 	userIDStr, exists := c.Get("userID")
 	if !exists {
@@ -47,63 +44,24 @@ func BookRide(c *gin.Context) {
 		return
 	}
 
-	// Add booking alert to a new collection
-	booking := models.BookingAlert{
-		ID:        primitive.NewObjectID(),
-		RideID:    ride.ID,
-		Passenger: userIDStr.(string),
-		DriverID:  ride.DriverID.Hex(),
-		Status:    "pending",
-		CreatedAt: time.Now(),
-	}
-
-	bookingCollection := config.GetCollection("booking_alerts")
-	_, err = bookingCollection.InsertOne(context.TODO(), booking)
+	// Convert user ID to ObjectID
+	userID, err := primitive.ObjectIDFromHex(userIDStr.(string))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send booking request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Booking request sent to driver. Waiting for confirmation."})
-}
-
-// AcceptBooking - Driver accepts a booking request
-func AcceptBooking(c *gin.Context) {
-	driverIDStr, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
+	// Update ride: decrease available seats and add passenger
+	update := bson.M{
+		"$inc":  bson.M{"seats": -1},
+		"$push": bson.M{"passenger_ids": userID},
 	}
 
-	bookingID := c.Query("booking_id")
-	if bookingID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing booking ID"})
-		return
-	}
-
-	bookingObjID, err := primitive.ObjectIDFromHex(bookingID)
+	_, err = rideCollection.UpdateOne(context.TODO(), bson.M{"_id": rideObjectID}, update)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid booking ID"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to book ride"})
 		return
 	}
 
-	bookingCollection := config.GetCollection("booking_alerts")
-	rideCollection := config.GetCollection("rides")
-
-	// Update booking status
-	update := bson.M{"$set": bson.M{"status": "confirmed"}}
-	filter := bson.M{"_id": bookingObjID, "driver_id": driverIDStr}
-	result, err := bookingCollection.UpdateOne(context.TODO(), filter, update)
-	if err != nil || result.MatchedCount == 0 {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to confirm booking or not authorized"})
-		return
-	}
-
-	// Decrease available seats in the ride
-	booking := models.BookingAlert{}
-	_ = bookingCollection.FindOne(context.TODO(), bson.M{"_id": bookingObjID}).Decode(&booking)
-	rideID := booking.RideID
-	_, _ = rideCollection.UpdateOne(context.TODO(), bson.M{"_id": rideID}, bson.M{"$inc": bson.M{"seats": -1}})
-
-	c.JSON(http.StatusOK, gin.H{"message": "Booking confirmed."})
+	c.JSON(http.StatusOK, gin.H{"message": "Ride booked successfully."})
 }
