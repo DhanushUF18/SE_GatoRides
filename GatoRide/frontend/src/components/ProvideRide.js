@@ -14,6 +14,7 @@ const ProvideRide = () => {
     pickup: { address: '', latitude: '', longitude: '' }, // Initialize with empty lat/lng
     dropoff: { address: '', latitude: '', longitude: '' },
     price: '',
+    seats: '',
     date: '', // Add date field
   });
 
@@ -147,6 +148,14 @@ const ProvideRide = () => {
     }));
   };
 
+  // Add this handler after the handleChange function
+  const handleSeatsChange = (e) => {
+    setRideDetails((prevDetails) => ({
+      ...prevDetails,
+      seats: e.target.value,
+    }));
+  };
+
   // Handle date input change
   const handleDateChange = (e) => {
     setRideDetails((prevDetails) => ({
@@ -169,6 +178,7 @@ const ProvideRide = () => {
     }
 
     // Ensure latitude and longitude are numbers
+    const formattedDate = new Date(rideDetails.date).toISOString();
     const payload = {
         pickup: {
             ...rideDetails.pickup,
@@ -181,7 +191,8 @@ const ProvideRide = () => {
             longitude: parseFloat(rideDetails.dropoff.longitude),
         },
         price: parseFloat(rideDetails.price),
-        date: rideDetails.date,
+        seats: parseFloat(rideDetails.seats),
+        date: formattedDate,
     };
 
     try {
@@ -265,6 +276,18 @@ const ProvideRide = () => {
           placeholder="Enter price"
           value={rideDetails.price}
           onChange={handleChange}
+          required
+        />
+
+        <h3>Available Seats</h3>
+        <input
+          type="number"
+          name="seats"
+          placeholder="Enter number of available seats"
+          value={rideDetails.seats}
+          onChange={handleSeatsChange}
+          min="1"
+          max="8"
           required
         />
 
