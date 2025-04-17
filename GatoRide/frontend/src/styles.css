@@ -330,3 +330,80 @@ button:hover, .btn:hover {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.available-rides-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.filters {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.rides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.ride-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    transition: transform 0.2s;
+}
+
+.ride-card:hover {
+    transform: translateY(-5px);
+}
+
+.ride-info h3 {
+    color: #333;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.ride-info p {
+    color: #666;
+    margin: 0.5rem 0;
+}
+
+.ride-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.book-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.book-button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+.book-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.loading, .error, .no-rides {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.error {
+    color: #dc3545;
+}

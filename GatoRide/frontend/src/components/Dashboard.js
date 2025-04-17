@@ -40,6 +40,7 @@ const Dashboard = () => {
               <p><strong>Pickup:</strong> {ridePayload.pickup.address}</p>
               <p><strong>Dropoff:</strong> {ridePayload.dropoff.address}</p>
               <p><strong>Price:</strong> ${ridePayload.price}</p>
+              <p><strong>Seats:</strong> {ridePayload.seats}</p>
               <p><strong>Date:</strong> {ridePayload.date}</p>
               <button onClick={() => handleBookRide(ridePayload)} className="btn btn-success">Book Ride</button>
             </div>

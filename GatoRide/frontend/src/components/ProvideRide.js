@@ -193,6 +193,8 @@ const ProvideRide = () => {
         price: parseFloat(rideDetails.price),
         seats: parseFloat(rideDetails.seats),
         date: formattedDate,
+        providerId: user.token, // Add provider's ID
+        status: 'active' // Add status
     };
 
     try {
