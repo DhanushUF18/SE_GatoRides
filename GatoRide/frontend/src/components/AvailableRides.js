@@ -23,7 +23,8 @@ const AvailableRides = () => {
                 const activeRides = response.data.filter(ride => 
                     ride.status === 'active' && 
                     new Date(ride.date) >= new Date() && 
-                    ride.seats > 0
+                    ride.seats > 0 &&
+                    ride.providerId !== user?.id  // Add this condition to filter out user's own rides
                 );
                 
                 setAvailableRides(activeRides);
@@ -93,12 +94,10 @@ const AvailableRides = () => {
                             <div className="ride-actions">
                                 <button 
                                     onClick={() => handleBookRide(ride._id)}
-                                    disabled={!user || ride.providerId === user.id}
+                                    disabled={!user}
                                     className="book-button"
                                 >
-                                    {!user ? 'Login to Book' : 
-                                     ride.providerId === user.id ? 'Your Ride' : 
-                                     'Book This Ride'}
+                                    {!user ? 'Login to Book' : 'Book This Ride'}
                                 </button>
                             </div>
                         </div>
