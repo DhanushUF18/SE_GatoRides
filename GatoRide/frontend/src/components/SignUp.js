@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // Add this import
 import '../styles.css';  // Import the global styles
 import axios from 'axios';
 
 const SignupForm = () => {
+  const navigate = useNavigate();  // Add this line
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -95,7 +97,8 @@ const handleLocationSelect = (location) => {
         localStorage.setItem("token", response.data.token);
         console.log("🔑 Token stored in localStorage:", response.data.token);
       }
-      alert("Sign up successful!");
+      alert("Sign up successful! Please verify email");
+      navigate('/login');  // Add this line to redirect to login page
     } catch (error) {
       console.error("❌ Signup Error:", error.response?.data || error);
       alert(`Error during signup: ${error.response?.data?.error || "Unknown error"}`);

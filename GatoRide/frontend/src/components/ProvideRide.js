@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import axios from 'axios';  // Ensure axios is imported
 import AuthContext from '../context/AuthContext';
 // import { useLocation } from 'react-router-dom';
@@ -6,6 +7,7 @@ import '../styles.css';
 import RideContext from '../context/RideContext';
 
 const ProvideRide = () => {
+  const navigate = useNavigate(); // Add this line
   const { user } = useContext(AuthContext); // Fetch user data from context
   const { setRidePayload } = useContext(RideContext); // Use setRidePayload from RideContext
 
@@ -236,6 +238,7 @@ const ProvideRide = () => {
         console.log("✅ Ride Provided:", response.data);
         alert("Ride provided successfully!");
         setRidePayload(payload);
+        navigate('/'); // Add this line to redirect to home page
     } catch (error) {
         console.error("❌ Error:", error.response?.data || error);
         alert(`Error: ${error.response?.data?.message || "Unknown error"}`);
