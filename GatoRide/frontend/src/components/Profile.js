@@ -1,12 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const { user } = useContext(AuthContext);
+  const { user, handleLogout } = useContext(AuthContext);
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState('');
-
+  const navigate = useNavigate();
+  const logoutHandler = () => {
+    handleLogout();
+    navigate('/');
+  };
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -41,6 +46,7 @@ const Profile = () => {
         <p><strong>Location:</strong> <span>{profile.location?.address}</span></p>
         <p><strong>Latitude:</strong> <span>{profile.location?.latitude}</span></p>
         <p><strong>Longitude:</strong> <span>{profile.location?.longitude}</span></p>
+        <button onClick={logoutHandler} className="btn btn-secondary">Logout</button>
       </div>
     </div>
   );

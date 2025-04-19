@@ -7,15 +7,9 @@ import HomeRides from './HomeRides'; // Import the new component
 import '../styles.css';  // Import global styles
 
 const Dashboard = () => {
-  const { user, handleLogout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const { ridePayload } = useContext(RideContext);
   const navigate = useNavigate();
-
-  const logoutHandler = () => {
-    handleLogout();
-    navigate('/');
-  };
-
   const handleCreateRide = () => {
     navigate('/ride-request'); // No need to pass setRidePayload
   };
@@ -53,7 +47,6 @@ const Dashboard = () => {
 
         <div className="actions">
           <button onClick={handleCreateRide} className="btn btn-primary">Create Ride</button>
-          <button onClick={logoutHandler} className="btn btn-secondary">Logout</button>
         </div>
       </div>
 
