@@ -4,7 +4,7 @@ import Login from '../components/Login';
 import Dashboard from '../components/Dashboard';
 import VerifyEmail from '../components/VerifyEmail';
 import RideRequest from '../components/ProvideRide';
-
+import Profile from '../components/Profile';
 const RouteConfig = [
   {
     path: '/',
@@ -26,6 +26,10 @@ const RouteConfig = [
   {
     path: '/ride-request',
     component: RideRequest,
+  },
+  {
+    path: '/profile',
+    component: Profile,
   },
   {
     path: '/verify-email/:token',
