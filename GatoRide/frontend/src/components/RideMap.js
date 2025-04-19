@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 // Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -22,7 +22,11 @@ const RideMap = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [routeCoordinates, setRouteCoordinates] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
+    const navigate = useNavigate();
 
+    const handleCreateRide = () => {
+        navigate('/ride-request'); // No need to pass setRidePayload
+      };
     // Updated fetchLocationSuggestions function to use Photon API
     const fetchLocationSuggestions = async (query, setSuggestions) => {
         if (!query) {
@@ -131,14 +135,13 @@ const RideMap = () => {
     const handleBookRide = async (rideId) => {
         try {
             // Replace with your actual booking API endpoint
-            const response = await fetch('/api/rides/book', {
-                method: 'POST',
+            const response = await axios.post('http://localhost:5001/user/book-ride', {}, {
                 headers: {
-                    'Content-Type': 'application/json',
+                  'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ rideId })
-            });
-    
+                body: JSON.stringify({ rideId }),
+              });
+
             if (!response.ok) {
                 throw new Error('Failed to book ride');
             }
@@ -235,6 +238,9 @@ const RideMap = () => {
                 </div>
 
                 <button type="submit" className="search-button">Search Route</button>
+            <div className="actions">
+                <button onClick={handleCreateRide} className="btn btn-primary">Create Ride</button>
+            </div>
             </form>
 
             {error && <div className="error-message" role="alert">{error}</div>}

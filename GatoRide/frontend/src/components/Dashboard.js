@@ -1,18 +1,16 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AuthContext from '../context/AuthContext';
+// import { useNavigate } from 'react-router-dom';
+// import AuthContext from '../context/AuthContext';
 import RideContext from '../context/RideContext';
 import RideMap from './RideMap';
 import HomeRides from './HomeRides'; // Import the new component
 import '../styles.css';  // Import global styles
 
 const Dashboard = () => {
-  const { user } = useContext(AuthContext);
+  // const { user } = useContext(AuthContext);
   const { ridePayload } = useContext(RideContext);
-  const navigate = useNavigate();
-  const handleCreateRide = () => {
-    navigate('/ride-request'); // No need to pass setRidePayload
-  };
+  // const navigate = useNavigate();
+  
 
   const handleBookRide = (ride) => {
     console.log(`Booking ride from ${ride.pickup.address} to ${ride.dropoff.address}`);
@@ -23,14 +21,14 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <div className="left-column">
         
-        <div className="user-details">
+        {/* <div className="user-details">
           <h2>User Details</h2>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Username:</strong> {user.username}</p>
-        </div>
+        </div> */}
 
         <div className="additional-element">
-          <h3>Ride Details</h3>
+          {/* <h3>Ride Details</h3> */}
           {ridePayload ? (
             <div>
               <p><strong>Pickup:</strong> {ridePayload.pickup.address}</p>
@@ -45,9 +43,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="actions">
-          <button onClick={handleCreateRide} className="btn btn-primary">Create Ride</button>
-        </div>
+        
       </div>
 
       <div className="right-column">
