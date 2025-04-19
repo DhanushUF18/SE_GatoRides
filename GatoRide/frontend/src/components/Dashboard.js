@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import RideContext from '../context/RideContext';
 import RideMap from './RideMap';
+import HomeRides from './HomeRides'; // Import the new component
 import '../styles.css';  // Import global styles
 
 const Dashboard = () => {
@@ -27,6 +28,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="left-column">
+        
         <div className="user-details">
           <h2>User Details</h2>
           <p><strong>Email:</strong> {user.email}</p>
@@ -57,6 +59,11 @@ const Dashboard = () => {
 
       <div className="right-column">
         <RideMap />
+      </div>
+
+      {/* Add the HomeRides component below the columns */}
+      <div className="bottom-section">
+        <HomeRides />
       </div>
     </div>
   );

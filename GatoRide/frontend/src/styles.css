@@ -6,6 +6,7 @@ body {
   margin: 0;
   padding: 0;
   text-align: center;
+  overflow: auto;
 }
 
 /* Container styles */
@@ -92,7 +93,7 @@ button:hover, .btn:hover {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  overflow: hidden;
+  overflow: auto;
   position: fixed;
 }
 
@@ -300,6 +301,8 @@ button:hover, .btn:hover {
   height: 50vh;                
   padding: 20px;
   box-sizing: border-box;
+  
+  
 }
 
 .left-column {
@@ -484,4 +487,32 @@ button:hover, .btn:hover {
     border: 1px solid #ffeeba;
     border-radius: 4px;
     color: #856404;
+}
+.rides-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.rides-table th, .rides-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.rides-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Align the bottom section with the center and apply similar styles */
+.bottom-section {
+  background-color: #1e1e1e; /* Match the background color of left and right columns */
+  padding: 20px; /* Add padding for spacing */
+  border: 1px solid #ccc; /* Add a border similar to left and right columns */
+  border-radius: 8px; /* Add rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+  margin: 20px auto; /* Center the section horizontally */
+  max-width: 800px; /* Limit the width */
+  text-align: center; /* Center-align the content */
 }
