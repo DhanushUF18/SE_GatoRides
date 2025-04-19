@@ -217,7 +217,7 @@ const ProvideRide = () => {
             longitude: parseFloat(rideDetails.dropoff.longitude),
         },
         price: parseFloat(rideDetails.price),
-        seats: parseFloat(rideDetails.seats),
+        seats: parseInt(rideDetails.seats),
         date: formattedDate,
         providerId: user.token,
         status: 'active',
@@ -235,13 +235,21 @@ const ProvideRide = () => {
             }
         });
 
+        // Store ride ID from response
+        const rideId = response.data.ride_id;
         console.log("✅ Ride Provided:", response.data);
-        alert("Ride provided successfully!");
-        setRidePayload(payload);
-        navigate('/'); // Add this line to redirect to home page
+        
+        // Store complete ride data in context
+        setRidePayload({
+            ...payload,
+            ride_id: rideId
+        });
+
+        alert(`Ride provided successfully!`);
+        navigate('/'); // Redirect to home page
     } catch (error) {
         console.error("❌ Error:", error.response?.data || error);
-        alert(`Error: ${error.response?.data?.message || "Unknown error"}`);
+        alert(`Error: ${error.response?.data?.message || "Failed to provide ride"}`);
     }
   };
 
