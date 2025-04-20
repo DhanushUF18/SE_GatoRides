@@ -12,12 +12,12 @@ const HomeRides = () => {
   useEffect(() => {
     const fetchRides = async () => {
       const token = user?.token;
-      console.log('Full user object structure:', {
-        id: user?.id,
-        _id: user?._id,
-        token: user?.token,
-        fullUser: user
-      });
+      // console.log('Full user object structure:', {
+      //   id: user?.id,
+      //   _id: user?._id,
+      //   token: user?.token,
+      //   fullUser: user
+      // });
       if (!token) {
         setError('Authorization token is missing.');
         setLoading(false);
@@ -30,9 +30,9 @@ const HomeRides = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('Full user object:', user);
-        console.log('Full response:', response.data);
-        console.log('First ride:', response.data.rides[0]);
+        // console.log('Full user object:', user);
+        // console.log('Full response:', response.data);
+        // console.log('First ride:', response.data.rides[0]);
         setRides(response.data.rides);
         setLoading(false);
       } catch (err) {
@@ -59,37 +59,37 @@ const HomeRides = () => {
 
   const handleRideClick = (ride) => {
     const userId = getUserIdFromToken(user?.token);
-    console.log('Ride click debug:', {
-      rideDriverId: ride.driver_id,
-      currentUserId: userId,
-      isOwnRide: ride.driver_id === userId
-    });
+    // console.log('Ride click debug:', {
+    //   rideDriverId: ride.driver_id,
+    //   currentUserId: userId,
+    //   isOwnRide: ride.driver_id === userId
+    // });
     setSelectedRide(selectedRide?.id === ride.id ? null : ride);
   };
 
   const handleBookRide = async (rideId) => {
     try {
-      await axios.post(`http://localhost:5001/user/book-ride/${rideId}`, {}, {
+      await axios.post(`http://localhost:5001/user/book-ride?ride_id=${rideId}`, {}, {
         headers: {
           Authorization: `Bearer ${user?.token}`
         }
       });
-      
+
       // Update the rides array to decrease the seats count
-      setRides(rides.map(ride => {
-        if (ride.id === rideId) {
-          // If no seats left after booking, remove the ride
-          if (ride.seats <= 1) {
-            return null;
-          }
-          // Otherwise decrease the seats count
-          return {
-            ...ride,
-            seats: ride.seats - 1
-          };
-        }
-        return ride;
-      }).filter(Boolean)); // Remove null entries (rides with no seats left)
+      // setRides(rides.map(ride => {
+      //   if (ride.id === rideId) {
+      //     // If no seats left after booking, remove the ride
+      //     if (ride.seats <= 1) {
+      //       return null;
+      //     }
+      //     // Otherwise decrease the seats count
+      //     return {
+      //       ...ride,
+      //       seats: ride.seats - 1
+      //     };
+      //   }
+      //   return ride;
+      // }).filter(Boolean)); // Remove null entries (rides with no seats left)
 
       setSelectedRide(null);
       alert('Ride booked successfully!');
