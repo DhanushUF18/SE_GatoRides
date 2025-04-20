@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import AuthContext from '../context/AuthContext'; // Import AuthContext
+import AuthContext from '../context/AuthContext';
 
 const HomeRides = () => {
   const [rides, setRides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useContext(AuthContext); // Get user data from AuthContext
+  const [selectedRide, setSelectedRide] = useState(null);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchRides = async () => {
-      const token = user?.token; // Retrieve the token from the user object
+      const token = user?.token;
+      console.log('Full user object structure:', {
+        id: user?.id,
+        _id: user?._id,
+        token: user?.token,
+        fullUser: user
+      });
       if (!token) {
         setError('Authorization token is missing.');
         setLoading(false);
@@ -20,11 +27,13 @@ const HomeRides = () => {
       try {
         const response = await axios.get('http://localhost:5001/home', {
           headers: {
-            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+            Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response.data); // Log the response data for debugging
-        setRides(response.data.rides); // Extract the rides array from the response
+        console.log('Full user object:', user);
+        console.log('Full response:', response.data);
+        console.log('First ride:', response.data.rides[0]);
+        setRides(response.data.rides);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch rides data.');
@@ -34,6 +43,45 @@ const HomeRides = () => {
 
     fetchRides();
   }, [user]);
+
+  // Add this function to decode JWT token
+  const getUserIdFromToken = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(window.atob(base64));
+      return payload.user_id;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  };
+
+  const handleRideClick = (ride) => {
+    const userId = getUserIdFromToken(user?.token);
+    console.log('Ride click debug:', {
+      rideDriverId: ride.driver_id,
+      currentUserId: userId,
+      isOwnRide: ride.driver_id === userId
+    });
+    setSelectedRide(selectedRide?.id === ride.id ? null : ride);
+  };
+
+  const handleBookRide = async (rideId) => {
+    try {
+      await axios.post(`http://localhost:5001/user/book-ride/${rideId}`, {}, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`
+        }
+      });
+      
+      setRides(rides.filter(ride => ride.id !== rideId)); // Changed from _id to id
+      setSelectedRide(null);
+      alert('Ride booked successfully!');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to book ride');
+    }
+  };
 
   if (loading) return <p>Loading rides...</p>;
   if (error) return <p>{error}</p>;
@@ -55,14 +103,34 @@ const HomeRides = () => {
           </thead>
           <tbody>
             {rides.map((ride) => (
-              <tr key={ride.id}>
-                <td>{ride.pickup.address}</td>
-                <td>{ride.dropoff.address}</td>
-                <td>${ride.price}</td>
-                <td>{ride.seats}</td>
-                <td>{new Date(ride.date).toLocaleDateString()}</td>
-                <td>{ride.status}</td>
-              </tr>
+              <React.Fragment key={ride._id}>
+                <tr 
+                  onClick={() => handleRideClick(ride)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td>{ride.pickup.address}</td>
+                  <td>{ride.dropoff.address}</td>
+                  <td>${ride.price}</td>
+                  <td>{ride.seats}</td>
+                  <td>{new Date(ride.date).toLocaleDateString()}</td>
+                  <td>{ride.status}</td>
+                </tr>
+                {selectedRide?.id === ride.id && (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center' }}>
+                      <button 
+                        onClick={() => handleBookRide(ride.id)}
+                        disabled={!user || ride.driver_id === getUserIdFromToken(user?.token)}
+                        className="book-button"
+                      >
+                        {!user ? 'Login to Book' : 
+                         ride.driver_id === getUserIdFromToken(user?.token) ? 'Cannot book own ride' : 
+                         'Book This Ride'}
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

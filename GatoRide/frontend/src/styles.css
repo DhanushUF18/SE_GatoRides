@@ -329,12 +329,6 @@ button:hover, .btn:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.additional-element {
-  background-color: #1e1e1e;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 .actions {
   display: flex;
@@ -396,7 +390,7 @@ button:hover, .btn:hover {
     justify-content: flex-end;
 }
 
-.book-button {
+/* .book-button {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -405,11 +399,8 @@ button:hover, .btn:hover {
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.2s;
-}
+} */
 
-.book-button:hover:not(:disabled) {
-    background-color: #45a049;
-}
 
 .book-button:disabled {
     background-color: #cccccc;
@@ -507,6 +498,10 @@ button:hover, .btn:hover {
   font-weight: bold;
 }
 
+.rides-table tr:hover {
+  background-color: #f5f5f5;
+}
+
 /* Align the bottom section with the center and apply similar styles */
 .bottom-section {
   background-color: #1e1e1e; /* Match the background color of left and right columns */
@@ -595,4 +590,19 @@ button:hover, .btn:hover {
   .profile-container strong {
     min-width: auto;
   }
+}
+
+.book-button {
+  padding: 8px 16px;
+  margin: 8px 0;
+  background-color: orange;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.book-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
