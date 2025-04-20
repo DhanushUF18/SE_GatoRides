@@ -3,7 +3,7 @@ import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
 const HomeRides = () => {
-  const [rides, setRides] = useState([]);
+  const [rides, setRides] = useState([]); // Ensure rides is initialized as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRide, setSelectedRide] = useState(null);
@@ -12,13 +12,7 @@ const HomeRides = () => {
   useEffect(() => {
     const fetchRides = async () => {
       const token = user?.token;
-      // console.log('Full user object structure:', {
-      //   id: user?.id,
-      //   _id: user?._id,
-      //   token: user?.token,
-      //   fullUser: user
-      // });
-      if (!token) {
+            if (!token) {
         setError('Authorization token is missing.');
         setLoading(false);
         return;
@@ -30,10 +24,9 @@ const HomeRides = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // console.log('Full user object:', user);
-        // console.log('Full response:', response.data);
-        // console.log('First ride:', response.data.rides[0]);
-        setRides(response.data.rides);
+        
+        // Safely handle cases where response.data.rides might be null or undefined
+        setRides(response.data.rides || []); // Default to an empty array if rides is null/undefined
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch rides data.');
@@ -71,25 +64,9 @@ const HomeRides = () => {
     try {
       await axios.post(`http://localhost:5001/user/book-ride?ride_id=${rideId}`, {}, {
         headers: {
-          Authorization: `Bearer ${user?.token}`
-        }
+          Authorization: `Bearer ${user?.token}`,
+        },
       });
-
-      // Update the rides array to decrease the seats count
-      // setRides(rides.map(ride => {
-      //   if (ride.id === rideId) {
-      //     // If no seats left after booking, remove the ride
-      //     if (ride.seats <= 1) {
-      //       return null;
-      //     }
-      //     // Otherwise decrease the seats count
-      //     return {
-      //       ...ride,
-      //       seats: ride.seats - 1
-      //     };
-      //   }
-      //   return ride;
-      // }).filter(Boolean)); // Remove null entries (rides with no seats left)
 
       setSelectedRide(null);
       alert('Ride booked successfully!');
