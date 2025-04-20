@@ -102,7 +102,7 @@ All new functionality (except the partially implemented Book Ride feature) is co
 - Develop notification system for ride updates
 
 ## Frontend Changes
-
+## Frontend [Video](https://drive.google.com/file/d/1rx7QIyYn_kviXtniAia0gln6X6o9ALG-/view?usp=sharing)
 ### 1. Ride Map Integration
 - **Description**: Integrated a dynamic ride map to display ride routes and locations.
 - **Features**:
