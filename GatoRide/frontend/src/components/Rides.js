@@ -32,7 +32,7 @@ const Rides = () => {
 
   const handleCancelBooking = async (rideId) => {
     try {
-      await axios.get(`http://localhost:5001/rides/cancel-booking?ride_id=${rideId}`, {}, {
+      await axios.post(`http://localhost:5001/user/cancel-booking?ride_id=${rideId}`, {}, {
         headers: {
           'Authorization': `Bearer ${user?.token}`,
         },
@@ -48,7 +48,7 @@ const Rides = () => {
 
   const handleCancelRideAsDriver = async (rideId) => {
     try {
-      await axios.get(`http://localhost:5001/rides/cancel?ride_id=${rideId}`, 
+      await axios.post(`http://localhost:5001/user/cancel-ride?ride_id=${rideId}`, 
         { },
         {
           headers: {
