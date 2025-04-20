@@ -78,6 +78,117 @@ func TestCancelBooking(t *testing.T) {
 		assert.False(t, passengerFound, "Passenger should have been removed")
 	})
 
+	// Test case: cancellation for a ride with "booked" status
+	t.Run("Cancellation for booked status ride", func(t *testing.T) {
+		// Convert mockUserID to ObjectID
+		userObjectID, err := primitive.ObjectIDFromHex(mockUserID)
+		assert.NoError(t, err)
+
+		// Create a test ride with booked status
+		rideID := primitive.NewObjectID()
+		testRide := models.Ride{
+			ID:           rideID,
+			DriverID:     primitive.NewObjectID(),
+			Status:       models.StatusBooked,
+			Seats:        1,
+			PassengerIDs: []primitive.ObjectID{userObjectID}, // User is a passenger
+			CreatedAt:    time.Now(),
+		}
+
+		// Insert test ride
+		collection := config.GetCollection("rides")
+		_, err = collection.InsertOne(context.TODO(), testRide)
+		assert.NoError(t, err)
+		defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+		// Create request
+		req, _ := http.NewRequest("GET", "/rides/cancel-booking?ride_id="+rideID.Hex(), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should be successful for booked status
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	// Test case: cancellation for a ride with "ongoing" status
+	t.Run("Cannot cancel booking for ongoing ride", func(t *testing.T) {
+		// Convert mockUserID to ObjectID
+		userObjectID, err := primitive.ObjectIDFromHex(mockUserID)
+		assert.NoError(t, err)
+
+		// Create a test ride with ongoing status
+		rideID := primitive.NewObjectID()
+		testRide := models.Ride{
+			ID:           rideID,
+			DriverID:     primitive.NewObjectID(),
+			Status:       models.StatusOngoing,
+			Seats:        1,
+			PassengerIDs: []primitive.ObjectID{userObjectID}, // User is a passenger
+			CreatedAt:    time.Now(),
+		}
+
+		// Insert test ride
+		collection := config.GetCollection("rides")
+		_, err = collection.InsertOne(context.TODO(), testRide)
+		assert.NoError(t, err)
+		defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+		// Create request
+		req, _ := http.NewRequest("GET", "/rides/cancel-booking?ride_id="+rideID.Hex(), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should return bad request for ongoing status
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		// Verify ride was NOT updated in the database (passenger still there)
+		var updatedRide models.Ride
+		err = collection.FindOne(context.TODO(), bson.M{"_id": rideID}).Decode(&updatedRide)
+		assert.NoError(t, err)
+
+		// Passenger should still be in the list
+		passengerFound := false
+		for _, passengerID := range updatedRide.PassengerIDs {
+			if passengerID == userObjectID {
+				passengerFound = true
+				break
+			}
+		}
+		assert.True(t, passengerFound, "Passenger should still be in the ride")
+	})
+
+	// Test case: cancellation for a ride with "completed" status
+	t.Run("Cannot cancel booking for completed ride", func(t *testing.T) {
+		// Convert mockUserID to ObjectID
+		userObjectID, err := primitive.ObjectIDFromHex(mockUserID)
+		assert.NoError(t, err)
+
+		// Create a test ride with completed status
+		rideID := primitive.NewObjectID()
+		testRide := models.Ride{
+			ID:           rideID,
+			DriverID:     primitive.NewObjectID(),
+			Status:       models.StatusCompleted,
+			Seats:        1,
+			PassengerIDs: []primitive.ObjectID{userObjectID}, // User is a passenger
+			CreatedAt:    time.Now(),
+		}
+
+		// Insert test ride
+		collection := config.GetCollection("rides")
+		_, err = collection.InsertOne(context.TODO(), testRide)
+		assert.NoError(t, err)
+		defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+		// Create request
+		req, _ := http.NewRequest("GET", "/rides/cancel-booking?ride_id="+rideID.Hex(), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should return bad request for completed status
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
 	// Test case: user not a passenger
 	t.Run("User not a passenger", func(t *testing.T) {
 		// Create a test ride with no passengers
