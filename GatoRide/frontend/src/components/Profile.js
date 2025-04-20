@@ -22,7 +22,9 @@ const Profile = () => {
     handleLogout();
     navigate('/');
   };
-
+  const navigateToRides = () => {
+    navigate('/rides');
+  };
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -183,6 +185,7 @@ const Profile = () => {
         <button onClick={() => setIsUpdating(!isUpdating)} className="btn btn-primary">
           {isUpdating ? 'Cancel' : 'Update Profile'}
         </button>
+        <button onClick={navigateToRides} className="btn btn-info">View Rides</button>
       </div>
 
       {isUpdating && (
