@@ -57,6 +57,14 @@ func CancelBooking(c *gin.Context) {
 		return
 	}
 
+	// Check if ride status allows cancellation (only open or booked)
+	if ride.Status != models.StatusOpen && ride.Status != models.StatusBooked {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("Cannot cancel booking for a ride with status '%s'. Only 'open' or 'booked' rides can be canceled", ride.Status),
+		})
+		return
+	}
+
 	// Check if user is a passenger on this ride
 	isPassenger := false
 	for _, passengerID := range ride.PassengerIDs {
