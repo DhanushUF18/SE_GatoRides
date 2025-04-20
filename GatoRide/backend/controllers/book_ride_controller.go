@@ -1,9 +1,12 @@
+// book_ride_controller.go
+
 package controllers
 
 import (
 	"backend/config"
 	"backend/models"
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +42,15 @@ func BookRide(c *gin.Context) {
 		return
 	}
 
+	// Check if ride status is open
+	if ride.Status != models.StatusOpen {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": fmt.Sprintf("Cannot book a ride with status '%s'. Only 'open' rides can be booked", ride.Status),
+		})
+		return
+	}
+
+	// Check if there are enough seats available
 	if ride.Seats <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No seats available"})
 		return
@@ -51,10 +63,23 @@ func BookRide(c *gin.Context) {
 		return
 	}
 
+	// Check if user is already a passenger on this ride
+	for _, passengerID := range ride.PassengerIDs {
+		if passengerID == userID {
+			c.JSON(http.StatusConflict, gin.H{"error": "You have already booked this ride"})
+			return
+		}
+	}
+
 	// Update ride: decrease available seats and add passenger
 	update := bson.M{
 		"$inc":  bson.M{"seats": -1},
 		"$push": bson.M{"passenger_ids": userID},
+	}
+
+	// If no seats remain after booking, update status to "booked"
+	if ride.Seats == 1 {
+		update["$set"] = bson.M{"status": models.StatusBooked}
 	}
 
 	_, err = rideCollection.UpdateOne(context.TODO(), bson.M{"_id": rideObjectID}, update)
@@ -63,5 +88,5 @@ func BookRide(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Ride booked successfully."})
+	c.JSON(http.StatusOK, gin.H{"message": "Ride booked successfully"})
 }
