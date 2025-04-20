@@ -83,6 +83,96 @@ func TestBookRide(t *testing.T) {
 			}
 		}
 		assert.True(t, passengerFound, "Passenger ID not found in the ride's passenger list")
+
+		// Status should still be open since there are seats left
+		assert.Equal(t, models.StatusOpen, updatedRide.Status)
+	})
+
+	// Test case: booking the last seat changes status to booked
+	t.Run("Booking last seat changes status to booked", func(t *testing.T) {
+		// Create a test ride with only 1 seat
+		rideID := primitive.NewObjectID()
+		testRide := models.Ride{
+			ID:        rideID,
+			DriverID:  primitive.NewObjectID(),
+			Status:    models.StatusOpen,
+			Seats:     1, // Only one seat available
+			CreatedAt: time.Now(),
+		}
+
+		// Insert test ride
+		collection := config.GetCollection("rides")
+		_, err := collection.InsertOne(context.TODO(), testRide)
+		assert.NoError(t, err)
+		defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+		// Create request
+		req, _ := http.NewRequest("GET", "/rides/book?ride_id="+rideID.Hex(), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		// Verify ride status was updated to booked
+		var updatedRide models.Ride
+		err = collection.FindOne(context.TODO(), bson.M{"_id": rideID}).Decode(&updatedRide)
+		assert.NoError(t, err)
+
+		// Status should be changed to booked
+		assert.Equal(t, models.StatusBooked, updatedRide.Status)
+
+		// Seats should be zero
+		assert.Equal(t, 0, updatedRide.Seats)
+	})
+
+	// Test case: booking a ride that's not open
+	t.Run("Cannot book non-open ride", func(t *testing.T) {
+		// Try with various non-open statuses
+		statuses := []models.RideStatus{
+			models.StatusBooked,
+			models.StatusOngoing,
+			models.StatusCompleted,
+			models.StatusCancelled,
+		}
+
+		for _, status := range statuses {
+			// Create a test ride with non-open status
+			rideID := primitive.NewObjectID()
+			testRide := models.Ride{
+				ID:        rideID,
+				DriverID:  primitive.NewObjectID(),
+				Status:    status,
+				Seats:     2,
+				CreatedAt: time.Now(),
+			}
+
+			// Insert test ride
+			collection := config.GetCollection("rides")
+			_, err := collection.InsertOne(context.TODO(), testRide)
+			assert.NoError(t, err)
+			defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+			// Create request
+			req, _ := http.NewRequest("GET", "/rides/book?ride_id="+rideID.Hex(), nil)
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, req)
+
+			// Assertions - should get bad request due to ride status
+			assert.Equal(t, http.StatusBadRequest, w.Code, "Should not allow booking ride with status "+string(status))
+
+			// Verify ride was not changed in the database
+			var unchangedRide models.Ride
+			err = collection.FindOne(context.TODO(), bson.M{"_id": rideID}).Decode(&unchangedRide)
+			assert.NoError(t, err)
+
+			// Status and seats should remain unchanged
+			assert.Equal(t, status, unchangedRide.Status)
+			assert.Equal(t, 2, unchangedRide.Seats)
+
+			// Passenger list should be empty
+			assert.Empty(t, unchangedRide.PassengerIDs)
+		}
 	})
 
 	// Test case: no seats available
@@ -110,6 +200,38 @@ func TestBookRide(t *testing.T) {
 
 		// Assertions - should get bad request due to no seats
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	// Test case: already a passenger
+	t.Run("Already a passenger", func(t *testing.T) {
+		// Convert mockUserID to ObjectID
+		userObjectID, err := primitive.ObjectIDFromHex(mockUserID)
+		assert.NoError(t, err)
+
+		// Create a test ride where user is already a passenger
+		rideID := primitive.NewObjectID()
+		testRide := models.Ride{
+			ID:           rideID,
+			DriverID:     primitive.NewObjectID(),
+			Status:       models.StatusOpen,
+			Seats:        2,
+			PassengerIDs: []primitive.ObjectID{userObjectID}, // User already a passenger
+			CreatedAt:    time.Now(),
+		}
+
+		// Insert test ride
+		collection := config.GetCollection("rides")
+		_, err = collection.InsertOne(context.TODO(), testRide)
+		assert.NoError(t, err)
+		defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+		// Create request
+		req, _ := http.NewRequest("GET", "/rides/book?ride_id="+rideID.Hex(), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should get conflict status
+		assert.Equal(t, http.StatusConflict, w.Code)
 	})
 
 	// Test case: invalid ride ID
