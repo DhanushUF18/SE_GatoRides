@@ -75,7 +75,22 @@ const HomeRides = () => {
         }
       });
       
-      setRides(rides.filter(ride => ride.id !== rideId)); // Changed from _id to id
+      // Update the rides array to decrease the seats count
+      setRides(rides.map(ride => {
+        if (ride.id === rideId) {
+          // If no seats left after booking, remove the ride
+          if (ride.seats <= 1) {
+            return null;
+          }
+          // Otherwise decrease the seats count
+          return {
+            ...ride,
+            seats: ride.seats - 1
+          };
+        }
+        return ride;
+      }).filter(Boolean)); // Remove null entries (rides with no seats left)
+
       setSelectedRide(null);
       alert('Ride booked successfully!');
     } catch (error) {
