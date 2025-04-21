@@ -115,6 +115,9 @@ func ProvideRide(c *gin.Context) {
 		"dropoff.latitude":  ride.Dropoff.Latitude,
 		"dropoff.longitude": ride.Dropoff.Longitude,
 		"status":            "open", // Only prevent duplicate if ride is still open
+		"date": bson.M{
+			"$eq": ride.Date,
+		},
 	}
 	existingRide := models.Ride{}
 	err = collection.FindOne(ctx, filter).Decode(&existingRide)
