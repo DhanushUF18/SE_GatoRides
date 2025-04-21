@@ -143,7 +143,9 @@ const Profile = () => {
     setUpdateError('');
     setSuccessMessage('');
     try {
+      // Get coordinates first
       const { latitude, longitude } = await fetchCoordinates(formData.address);
+      
       const response = await axios.post(
         'http://localhost:5001/user/update-profile',
         {
@@ -162,6 +164,7 @@ const Profile = () => {
           },
         }
       );
+      
       setSuccessMessage('Profile updated successfully!');
       setProfile(response.data.user);
       setIsUpdating(false);
@@ -191,8 +194,9 @@ const Profile = () => {
       {isUpdating && (
         <form onSubmit={handleUpdateProfile} className="update-profile-form">
           <div>
-            <label>Name:</label>
+            <label htmlFor="name">Name:</label>
             <input
+              id="name"
               type="text"
               name="name"
               value={formData.name}
@@ -201,8 +205,9 @@ const Profile = () => {
             />
           </div>
           <div>
-            <label>Username:</label>
+            <label htmlFor="username">Username:</label>
             <input
+              id="username"
               type="text"
               name="username"
               value={formData.username}
@@ -211,8 +216,9 @@ const Profile = () => {
             />
           </div>
           <div>
-            <label>Address:</label>
+            <label htmlFor="address">Address:</label>
             <input
+              id="address"
               type="text"
               name="address"
               value={formData.address}
