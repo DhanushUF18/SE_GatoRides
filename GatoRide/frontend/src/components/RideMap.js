@@ -111,12 +111,12 @@ const RideMap = ({ setRides }) => {
         const formattedDate = new Date(selectedDate).toISOString().split('T')[0];
 
         const payload = {
-            pickup: {
+            from: {
                 address: fromLocation.display_name,
                 latitude: parseFloat(fromLocation.lat),
                 longitude: parseFloat(fromLocation.lon),
             },
-            dropoff: {
+            to: {
                 address: toLocation.display_name,
                 latitude: parseFloat(toLocation.lat),
                 longitude: parseFloat(toLocation.lon),
@@ -140,6 +140,7 @@ const RideMap = ({ setRides }) => {
             }
 
             setRides(response.data); // Update the shared rides state with the search results
+            console.log('Available rides:', response.data); // Log the available rides for debugging
         } catch (error) {
             setError('Failed to fetch available rides. Please try again.');
             console.error('Error fetching rides:', error);

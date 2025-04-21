@@ -8,7 +8,14 @@ const HomeRides = ({ rides: searchRides }) => {
   const [error, setError] = useState(null);
   const [selectedRide, setSelectedRide] = useState(null);
   const { user } = useContext(AuthContext);
-
+  
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${month}/${day}/${year}`;
+  };
   useEffect(() => {
     const fetchRides = async () => {
       const token = user?.token;
@@ -28,6 +35,7 @@ const HomeRides = ({ rides: searchRides }) => {
         // Safely handle cases where response.data.rides might be null or undefined
         setRides(response.data.rides || []); // Default to an empty array if rides is null/undefined
         setLoading(false);
+        console.log('Default /home API rides:', response.data.rides || []); // Log the /home API response
       } catch (err) {
         setError('Failed to fetch rides data.');
         setLoading(false);
@@ -38,7 +46,12 @@ const HomeRides = ({ rides: searchRides }) => {
   }, [user]);
 
   // Use searchRides if provided, otherwise fallback to default rides
-  const displayedRides = searchRides && searchRides.length > 0 ? searchRides : rides;
+  const displayedRides = searchRides && searchRides.rides && searchRides.rides.length > 0 
+    ? searchRides.rides 
+    : rides;
+
+  console.log('searchRides prop:', searchRides); // Log the searchRides prop
+  console.log('displayedRides:', displayedRides); // Log the displayedRides variable
 
   const getUserIdFromToken = (token) => {
     try {
@@ -100,7 +113,7 @@ const HomeRides = ({ rides: searchRides }) => {
                   <td>{ride.dropoff.address}</td>
                   <td>${ride.price}</td>
                   <td>{ride.seats}</td>
-                  <td>{new Date(ride.date).toLocaleDateString()}</td>
+                  <td>{formatDate(ride.date)}</td>
                   <td>{ride.status}</td>
                 </tr>
                 {selectedRide?.id === ride.id && (
