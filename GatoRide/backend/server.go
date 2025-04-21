@@ -3,6 +3,7 @@ package main
 import (
 	"backend/config"
 	"backend/routes"
+	"backend/utils"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 func main() {
 	config.ConnectDB()
 	router := routes.SetupRoutes()
+	utils.StartCleanupScheduler()
 
 	port := os.Getenv("PORT")
 	if port == "" {
