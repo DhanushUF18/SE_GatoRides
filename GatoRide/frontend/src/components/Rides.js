@@ -8,6 +8,13 @@ const Rides = () => {
   const [ridesTaken, setRidesTaken] = useState([]);
   const [error, setError] = useState('');
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${month}/${day}/${year}`;
+  };
   useEffect(() => {
     const fetchRides = async () => {
       try {
@@ -100,7 +107,7 @@ const Rides = () => {
                 <tr key={ride.id}>
                   <td>{ride.pickup.address}</td>
                   <td>{ride.dropoff.address}</td>
-                  <td>{new Date(ride.date).toLocaleDateString()}</td>
+                  <td>{formatDate(ride.date)}</td>
                   <td>{ride.seats}</td>
                   <td>${ride.price}</td>
                   <td>{ride.status}</td>
@@ -151,7 +158,7 @@ const Rides = () => {
                 <tr key={ride.id}>
                   <td>{ride.pickup.address}</td>
                   <td>{ride.dropoff.address}</td>
-                  <td>{new Date(ride.date).toLocaleDateString()}</td>
+                  <td>{formatDate(ride.date)}</td>
                   <td>{ride.driver_name}</td>
                   <td>${ride.price}</td>
                   <td>{ride.status}</td>

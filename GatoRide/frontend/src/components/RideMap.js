@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 // Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -12,7 +13,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: require('leaflet/dist/images/marker-shadow.png')
 });
 
-const RideMap = () => {
+const RideMap = ({ setRides }) => {
     const [fromLocation, setFromLocation] = useState(null);
     const [toLocation, setToLocation] = useState(null);
     const [fromSuggestions, setFromSuggestions] = useState([]);
@@ -23,7 +24,8 @@ const RideMap = () => {
     const [routeCoordinates, setRouteCoordinates] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
     const navigate = useNavigate();
-
+    const { user } = useContext(AuthContext);
+    const token = user?.token;
     const handleCreateRide = () => {
         navigate('/ride-request'); // No need to pass setRidePayload
       };
@@ -105,25 +107,40 @@ const RideMap = () => {
             return;
         }
 
+        // Format the date as YYYY-MM-DD
+        const formattedDate = new Date(selectedDate).toISOString().split('T')[0];
+
+        const payload = {
+            from: {
+                address: fromLocation.display_name,
+                latitude: parseFloat(fromLocation.lat),
+                longitude: parseFloat(fromLocation.lon),
+            },
+            to: {
+                address: toLocation.display_name,
+                latitude: parseFloat(toLocation.lat),
+                longitude: parseFloat(toLocation.lon),
+            },
+            date: formattedDate, // Use the correctly formatted date
+            seats: 1,
+        };
+
+        console.log('Payload:', payload); // Log the payload for debugging
+
         try {
-            const response = await fetch('/api/rides/search', {
-                method: 'POST',
+            const response = await axios.post('http://localhost:5001/user/search-ride', payload, {
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({
-                    fromLocation,
-                    toLocation,
-                    date: selectedDate
-                })
             });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 throw new Error('Failed to fetch rides');
             }
 
-            const data = await response.json();
-            setAvailableRides(data);
+            setRides(response.data); // Update the shared rides state with the search results
+            console.log('Available rides:', response.data); // Log the available rides for debugging
         } catch (error) {
             setError('Failed to fetch available rides. Please try again.');
             console.error('Error fetching rides:', error);
