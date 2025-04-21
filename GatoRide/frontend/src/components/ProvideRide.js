@@ -237,7 +237,7 @@ const ProvideRide = () => {
 
         // Store ride ID from response
         const rideId = response.data.ride_id;
-        console.log("✅ Ride Provided:", response.data);
+        // console.log("✅ Ride Provided:", response.data);
         
         // Store complete ride data in context
         setRidePayload({

@@ -35,7 +35,7 @@ const HomeRides = ({ rides: searchRides }) => {
         // Safely handle cases where response.data.rides might be null or undefined
         setRides(response.data.rides || []); // Default to an empty array if rides is null/undefined
         setLoading(false);
-        console.log('Default /home API rides:', response.data.rides || []); // Log the /home API response
+        // console.log('Default /home API rides:', response.data.rides || []); // Log the /home API response
       } catch (err) {
         setError('Failed to fetch rides data.');
         setLoading(false);
@@ -50,8 +50,8 @@ const HomeRides = ({ rides: searchRides }) => {
     ? searchRides.rides 
     : rides;
 
-  console.log('searchRides prop:', searchRides); // Log the searchRides prop
-  console.log('displayedRides:', displayedRides); // Log the displayedRides variable
+  // console.log('searchRides prop:', searchRides); // Log the searchRides prop
+  // console.log('displayedRides:', displayedRides); // Log the displayedRides variable
 
   const getUserIdFromToken = (token) => {
     try {

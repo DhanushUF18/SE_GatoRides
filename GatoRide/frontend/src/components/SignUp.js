@@ -85,17 +85,17 @@ const handleLocationSelect = (location) => {
       }
     };
 
-    console.log("🔹 Sending Payload:", JSON.stringify(payload, null, 2));
+    // console.log("🔹 Sending Payload:", JSON.stringify(payload, null, 2));
 
     try {
       const response = await axios.post("http://localhost:5001/signup", payload, {
         headers: { "Content-Type": "application/json" }
       });
 
-      console.log("✅ Signup Response:", response.data);
+      //console.log("✅ Signup Response:", response.data);
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        console.log("🔑 Token stored in localStorage:", response.data.token);
+        //console.log("🔑 Token stored in localStorage:", response.data.token);
       }
       alert("Sign up successful! Please verify email");
       navigate('/login');  // Add this line to redirect to login page

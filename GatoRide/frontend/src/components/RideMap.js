@@ -125,7 +125,7 @@ const RideMap = ({ setRides }) => {
             seats: 1,
         };
 
-        console.log('Payload:', payload); // Log the payload for debugging
+        // console.log('Payload:', payload); // Log the payload for debugging
 
         try {
             const response = await axios.post('http://localhost:5001/user/search-ride', payload, {
@@ -140,7 +140,7 @@ const RideMap = ({ setRides }) => {
             }
 
             setRides(response.data); // Update the shared rides state with the search results
-            console.log('Available rides:', response.data); // Log the available rides for debugging
+            // console.log('Available rides:', response.data); // Log the available rides for debugging
         } catch (error) {
             setError('Failed to fetch available rides. Please try again.');
             console.error('Error fetching rides:', error);
