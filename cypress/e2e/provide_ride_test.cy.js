@@ -20,7 +20,7 @@ describe('ProvideRide Component', () => {
       cy.get('input[name="dropoff"]').should('exist');
       cy.get('input[name="price"]').should('exist');
       cy.get('input[name="date"]').should('exist');
-      cy.get('button[type="submit"]').should('contain', 'Submit Ride Request');
+      cy.get('button[type="submit"]').should('contain', 'Provide Ride');
     });
   
     it('should allow users to enter pickup and dropoff locations and fetch suggestions', () => {
