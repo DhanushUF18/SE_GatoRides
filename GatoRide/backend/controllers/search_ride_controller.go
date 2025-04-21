@@ -47,7 +47,7 @@ func SearchRides(c *gin.Context) {
 	// Fetch all open rides within that day
 	filter := bson.M{
 		"status": "open",
-		"created_at": bson.M{
+		"date": bson.M{
 			"$gte": startOfDay,
 			"$lt":  endOfDay,
 		},
