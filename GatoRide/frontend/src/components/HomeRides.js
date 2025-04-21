@@ -51,7 +51,7 @@ const HomeRides = () => {
   };
 
   const handleRideClick = (ride) => {
-    const userId = getUserIdFromToken(user?.token);
+    // const userId = getUserIdFromToken(user?.token);
     // console.log('Ride click debug:', {
     //   rideDriverId: ride.driver_id,
     //   currentUserId: userId,
