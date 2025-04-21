@@ -106,7 +106,7 @@ const handleLocationSelect = (location) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="signup-form">
+    <form onSubmit={handleSubmit} className="signup-form" role="form">
       <h2>Join GatoRides</h2>
       <p>Create your account to start ride-sharing.</p>
       <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
