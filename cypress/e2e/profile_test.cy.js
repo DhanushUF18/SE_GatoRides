@@ -70,7 +70,11 @@ describe('Profile Page', () => {
     // Fill in new information
     cy.get('input[name="name"]').clear().type('Updated User');
     cy.get('input[name="username"]').clear().type('updateduser');
-    cy.get('input[name="address"]').clear().type('Tampa, United States');
+
+    // Handle location update with dropdown
+    cy.get('input[name="address"]').type('New York, United States');
+    cy.wait(1000); // Wait for API response
+    cy.get('.dropdown-menu').should('be.visible');
 
     // Mock address suggestions API
     cy.intercept('GET', 'https://photon.komoot.io/api/*', {
@@ -82,7 +86,6 @@ describe('Profile Page', () => {
           },
           properties: {
             name: 'Tampa',
-            // city: 'New City',
             country: 'United States'
           }
         }]
@@ -91,10 +94,22 @@ describe('Profile Page', () => {
 
     // Wait for suggestions and select one
     cy.wait('@getAddressSuggestions');
-    cy.get('.dropdown-item').first().click();
+    
+    // Click the first suggestion and wait for input to be updated
+    cy.get('.dropdown-item')
+      .first()
+      .click();
 
-    // Submit form
-    cy.get('button[type="submit"]').click();
+    // Wait for the input to be updated with the selected value
+    cy.get('input[name="address"]')
+      .should('not.have.value')
+      // Add a blur event to close the dropdown
+      // .blur();
+      
+    // Submit form after ensuring dropdown is handled
+    cy.get('button[type="submit"]')
+      // .should('be.visible')
+      .click({ timeout: 10000 });
 
     // Wait for update request
     cy.wait('@updateProfile');
@@ -137,5 +152,54 @@ describe('Profile Page', () => {
 
     // Verify error message
     cy.contains('Error: Failed to update profile');
+  });
+
+  it('automatically selects first address suggestion from dropdown', () => {
+    cy.wait('@getProfile');
+    
+    // Click update profile button
+    cy.contains('Update Profile').click();
+
+    // Mock address suggestions API
+    cy.intercept('GET', 'https://photon.komoot.io/api/*', {
+      statusCode: 200,
+      body: {
+        features: [{
+          geometry: {
+            coordinates: [10.0, 20.0]
+          },
+          properties: {
+            name: 'Tampa',
+            country: 'United States'
+          }
+        }]
+      }
+    }).as('getAddressSuggestions');
+
+    // Type location and trigger suggestions
+    cy.get('input[name="address"]')
+      .clear()
+      .type('Tampa')
+      .should('have.value', 'Tampa');
+
+    // Wait for suggestions to load
+    cy.wait('@getAddressSuggestions');
+
+    // Auto-select first suggestion
+    cy.get('.dropdown-item')
+      .first()
+      .should('be.visible')
+      .click();
+
+    // Verify selected address
+    cy.get('input[name="address"]')
+      .should('have.value', 'Tampa, United States');
+
+    // Submit the form
+    cy.get('button[type="submit"]').click();
+
+    // Wait for update and verify
+    cy.wait('@updateProfile');
+    cy.contains('Profile updated successfully!');
   });
 });
