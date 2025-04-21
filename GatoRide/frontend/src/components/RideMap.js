@@ -102,7 +102,7 @@ const RideMap = ({ setRides }) => {
         setIsLoading(true);
 
         if (!fromLocation || !toLocation || !selectedDate) {
-            setError('Please select valid locations and date.');
+            setError('Please select valid locations.');
             setIsLoading(false);
             return;
         }
