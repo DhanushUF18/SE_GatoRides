@@ -11,7 +11,7 @@ describe('Profile Page', () => {
           email: 'test@example.com',
           is_verified: true,
           location: {
-            address: '123 Test St, Test City'
+            address: 'Tampa, United States'
           }
         }
       }));
@@ -27,7 +27,7 @@ describe('Profile Page', () => {
           email: 'test@example.com',
           is_verified: true,
           location: {
-            address: '123 Test St, Test City'
+            address: 'Tampa, United States'
           }
         }
       }
@@ -58,7 +58,7 @@ describe('Profile Page', () => {
     cy.contains('Username: testuser');
     cy.contains('Email: test@example.com');
     cy.contains('Verified: Yes');
-    cy.contains('Location: 123 Test St, Test City');
+    cy.contains('Location: Tampa, United States');
   });
 
   it('allows updating profile information', () => {
@@ -72,39 +72,43 @@ describe('Profile Page', () => {
     cy.get('input[name="username"]').clear().type('updateduser');
 
     // Handle location update with dropdown
-    cy.get('input[name="address"]').type('New York, United States');
-    cy.wait(1000); // Wait for API response
-    cy.get('.dropdown-menu').should('be.visible');
+    // cy.get('input[name="address"]').type('New York, United States');
+    // cy.wait(1000); // Wait for API response
+    // cy.get('.dropdown-menu').should('be.visible');
 
     // Mock address suggestions API
-    cy.intercept('GET', 'https://photon.komoot.io/api/*', {
-      statusCode: 200,
-      body: {
-        features: [{
-          geometry: {
-            coordinates: [10.0, 20.0]
-          },
-          properties: {
-            name: 'Tampa',
-            country: 'United States'
-          }
-        }]
-      }
-    }).as('getAddressSuggestions');
+    // cy.intercept('GET', 'https://photon.komoot.io/api/*', {
+    //   statusCode: 200,
+    //   body: {
+    //     features: [{
+    //       geometry: {
+    //         coordinates: [10.0, 20.0]
+    //       },
+    //       properties: {
+    //         name: 'Tampa',
+    //         //country: 'United States'
+    //       }
+    //     }]
+    //   }
+    // }).as('getAddressSuggestions');
 
-    // Wait for suggestions and select one
-    cy.wait('@getAddressSuggestions');
-    
+    // // Wait for suggestions and select one
+    // cy.wait('@getAddressSuggestions');
+    cy.get('input[name="address"]').clear().type('Orlando International Airport');
+      cy.wait(10000);
+      cy.get('.dropdown-menu').should('be.visible');
+      cy.get('.dropdown-item').first().click();
+      cy.get('input[name="address"]').should('not.have.value', '');
     // Click the first suggestion and wait for input to be updated
-    cy.get('.dropdown-item')
-      .first()
-      .click();
-
-    // Wait for the input to be updated with the selected value
-    cy.get('input[name="address"]')
-      .should('not.have.value')
-      // Add a blur event to close the dropdown
-      // .blur();
+    // cy.get('.dropdown-item')
+    //   .first()
+    //   .click();
+    //   cy.wait(10000);
+    // // Wait for the input to be updated with the selected value
+    // cy.get('input[name="address"]')
+    //   .should('not.have.value')
+    //   // Add a blur event to close the dropdown
+    //   // .blur();
       
     // Submit form after ensuring dropdown is handled
     cy.get('button[type="submit"]')
