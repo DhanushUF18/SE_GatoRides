@@ -25,7 +25,7 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/user/book-ride", controllers.BookRide)
 		protected.POST("/user/cancel-booking", controllers.CancelBooking)
 		protected.POST("/user/cancel-ride", controllers.CancelRide)
-		protected.GET("/user/profile", controllers.GetUserProfile)
+		protected.POST("/user/profile", controllers.GetUserProfile)
 		protected.POST("/user/update-profile", controllers.UpdateUserProfile)
 		protected.POST("/user/rides", controllers.GetUserRides)
 		protected.GET("/home", controllers.HomeHandler)
