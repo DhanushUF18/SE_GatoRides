@@ -5,6 +5,7 @@ import (
 	"backend/controllers"
 	"backend/models"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -246,5 +247,24 @@ func TestCancelBooking(t *testing.T) {
 
 		// Assertions
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	// Test case: attempt to cancel with ride not found
+	t.Run("Ride not found for cancellation", func(t *testing.T) {
+		// Create a non-existent ride ID
+		nonExistentRideID := primitive.NewObjectID().Hex()
+
+		// Make request with non-existent ride ID
+		req, _ := http.NewRequest("GET", "/rides/cancel-booking?ride_id="+nonExistentRideID, nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should return not found
+		assert.Equal(t, http.StatusNotFound, w.Code)
+
+		// Verify error message
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response["error"], "Ride not found")
 	})
 }
