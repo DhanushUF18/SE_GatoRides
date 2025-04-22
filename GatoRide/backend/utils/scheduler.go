@@ -22,7 +22,7 @@ func CleanupOldRides() {
 
 	update := bson.M{
 		"$set": bson.M{
-			"status": "cancelled", // or use a constant like StatusCancelled if you import models
+			"status": "cancelled",
 		},
 	}
 
@@ -35,7 +35,7 @@ func CleanupOldRides() {
 }
 
 func StartCleanupScheduler() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(5 * time.Second) //less time for demo purposes
 	go func() {
 		for range ticker.C {
 			log.Println("🕐 Running scheduled cleanup for expired rides...")
