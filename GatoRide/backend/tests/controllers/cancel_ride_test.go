@@ -5,6 +5,7 @@ import (
 	"backend/controllers"
 	"backend/models"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -123,6 +124,38 @@ func TestCancelRide(t *testing.T) {
 
 		// Assertions
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	// Test case: cannot cancel ride as non-driver
+	t.Run("Cannot cancel ride as non-driver", func(t *testing.T) {
+		// Create a test ride with a different driver
+		rideID := primitive.NewObjectID()
+		testRide := models.Ride{
+			ID:        rideID,
+			DriverID:  primitive.NewObjectID(), // Some other driver
+			Status:    models.StatusOpen,
+			Seats:     2,
+			CreatedAt: time.Now(),
+		}
+
+		// Insert into DB
+		collection := config.GetCollection("rides")
+		_, err := collection.InsertOne(context.TODO(), testRide)
+		assert.NoError(t, err)
+		defer collection.DeleteOne(context.TODO(), bson.M{"_id": rideID})
+
+		// Make request
+		req, _ := http.NewRequest("GET", "/rides/cancel?ride_id="+rideID.Hex(), nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should return forbidden
+		assert.Equal(t, http.StatusForbidden, w.Code)
+
+		// Verify error message
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response["error"], "not the driver")
 	})
 
 }
