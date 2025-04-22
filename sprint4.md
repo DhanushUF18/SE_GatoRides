@@ -93,7 +93,7 @@ All new functionality is covered by unit tests. Tests verify:
 - Added detailed documentation for all new functionality
 
 
-## Frontend- [Video]((https://drive.google.com/file/d/1EYxOFblu4KKjdRCwQzjZUdbrB1SaXs3R/view?usp=drive_link))
+## Frontend- [Video](https://drive.google.com/file/d/1EYxOFblu4KKjdRCwQzjZUdbrB1SaXs3R/view?usp=drive_link)
 
 ## Overview
 This document outlines the functionalities implemented during Sprint 4 of the GatoRide application backend.
