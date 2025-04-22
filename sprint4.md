@@ -23,7 +23,7 @@ This document outlines the functionalities implemented during Sprint 4 of the Ga
   - Tests for various error conditions (already booked, no seats, wrong status)
 
 ### 2. Cancel Booking Functionality
-- **Endpoint**: `POST /rides/cancel-booking`
+- **Endpoint**: `POST /rides/cancel-booking?ride_id=RIDE_ID`
 - **Description**: Allows passengers to cancel their bookings
 - **Features**:
   - Verifies user is a passenger on the ride
@@ -38,7 +38,7 @@ This document outlines the functionalities implemented during Sprint 4 of the Ga
   - Error handling for various edge cases
 
 ### 3. Cancel Ride Functionality
-- **Endpoint**: `POST /rides/cancel-ride`
+- **Endpoint**: `POST /rides/cancel-ride?ride_id=RIDE_ID`
 - **Description**: Allows drivers to cancel rides they've offered
 - **Features**:
   - Verifies user is the driver of the ride
@@ -49,6 +49,29 @@ This document outlines the functionalities implemented during Sprint 4 of the Ga
   - Successful ride cancellations by drivers
   - Authorization checks (only driver can cancel)
   - Error handling for various scenarios
+
+
+## Scheduled Ride Cleanup
+
+### 4. Automatic Status Update for Expired Rides
+- **Description**: Periodically checks and cancels rides that are no longer valid.
+- **Features**:
+  - Runs a scheduled job every 6 hours
+  - Cancels rides in the past with "open" status by marking them as "cancelled"
+  - Helps maintain a clean and accurate ride feed
+- **Implementation**: Implemented in `utils/scheduler.go`
+- **Notes**: Triggered via a goroutine at backend startup in `main.go`
+
+## Request/Response Logging
+
+### 5. Middleware Logging for All API Calls
+- **Description**: Logs all HTTP requests and responses to a file.
+- **Features**:
+  - Captures HTTP method, path, headers, request body, status code, response body, and latency
+  - Outputs logs to `logs/server.log` file
+  - Ensures visibility into backend activity for debugging and auditing
+- **Implementation**: Middleware implemented in `middlewares/logger.go` and registered in `main.go`
+
 
 ## Testing
 
