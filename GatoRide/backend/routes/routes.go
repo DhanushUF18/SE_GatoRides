@@ -9,6 +9,7 @@ import (
 
 func SetupRoutes() *gin.Engine {
 	r := gin.Default()
+	r.Use(middlewares.RequestResponseLogger())
 
 	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)
