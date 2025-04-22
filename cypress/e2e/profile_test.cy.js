@@ -95,7 +95,7 @@ describe('Profile Page', () => {
     // // Wait for suggestions and select one
     // cy.wait('@getAddressSuggestions');
     cy.get('input[name="address"]').clear().type('Orlando International Airport');
-      cy.wait(10000);
+      cy.wait(15000);
       cy.get('.dropdown-menu').should('be.visible');
       cy.get('.dropdown-item').first().click();
       cy.get('input[name="address"]').should('not.have.value', '');
