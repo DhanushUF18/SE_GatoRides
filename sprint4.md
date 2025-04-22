@@ -8,7 +8,7 @@ This document outlines the functionalities implemented during Sprint 4 of the Ga
 ## New Features
 
 ### 1. Book Ride Functionality
-- **Endpoint**: `POST /rides/book-ride?ride_id=RIDE_ID`
+- **Endpoint**: `POST /rides/book-ride`
 - **Description**: Allows users to book available rides
 - **Features**:
   - Books a ride for the authenticated user
@@ -23,7 +23,7 @@ This document outlines the functionalities implemented during Sprint 4 of the Ga
   - Tests for various error conditions (already booked, no seats, wrong status)
 
 ### 2. Cancel Booking Functionality
-- **Endpoint**: `POST /rides/cancel-booking?ride_id=RIDE_ID`
+- **Endpoint**: `POST /rides/cancel-booking`
 - **Description**: Allows passengers to cancel their bookings
 - **Features**:
   - Verifies user is a passenger on the ride
@@ -38,7 +38,7 @@ This document outlines the functionalities implemented during Sprint 4 of the Ga
   - Error handling for various edge cases
 
 ### 3. Cancel Ride Functionality
-- **Endpoint**: `POST /rides/cancel-ride?ride_id=RIDE_ID`
+- **Endpoint**: `POST /rides/cancel-ride`
 - **Description**: Allows drivers to cancel rides they've offered
 - **Features**:
   - Verifies user is the driver of the ride
