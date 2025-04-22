@@ -5,6 +5,7 @@ import (
 	"backend/controllers"
 	"backend/models"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -264,4 +265,21 @@ func TestBookRide(t *testing.T) {
 		// Assertions
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})
+
+	// Test case: booking attempt with missing ride ID
+	t.Run("Missing ride ID validation", func(t *testing.T) {
+		// Create request without ride_id parameter
+		req, _ := http.NewRequest("GET", "/rides/book", nil)
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions - should fail with bad request
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		// Verify error message
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		assert.Contains(t, response["error"], "Missing ride ID")
+	})
+
 }

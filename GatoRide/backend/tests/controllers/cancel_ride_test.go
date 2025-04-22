@@ -124,4 +124,5 @@ func TestCancelRide(t *testing.T) {
 		// Assertions
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
+
 }
