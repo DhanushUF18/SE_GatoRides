@@ -28,7 +28,11 @@ func setupSearchRideRouter() *gin.Engine {
 func TestSearchRides_Success(t *testing.T) {
 	router := setupSearchRideRouter()
 
-	// Arrange: insert a ride into DB
+	// ✅ Arrange: Set fixed test date
+	testDateStr := "2025-04-01"
+	testDate, _ := time.Parse("2006-01-02", testDateStr)
+
+	// ✅ Insert a matching ride
 	ride := models.Ride{
 		ID:        primitive.NewObjectID(),
 		DriverID:  primitive.NewObjectID(),
@@ -37,14 +41,14 @@ func TestSearchRides_Success(t *testing.T) {
 		Status:    models.StatusOpen,
 		Price:     20,
 		Seats:     3,
-		Date:      time.Now(),
+		Date:      testDate,
 		CreatedAt: time.Now(),
 	}
 	collection := config.GetCollection("rides")
 	_, err := collection.InsertOne(context.TODO(), ride)
 	assert.NoError(t, err)
 
-	// Prepare request payload
+	// ✅ Prepare request with matching location + date
 	requestBody, _ := json.Marshal(map[string]interface{}{
 		"from": map[string]interface{}{
 			"latitude":  ride.Pickup.Latitude,
@@ -54,8 +58,8 @@ func TestSearchRides_Success(t *testing.T) {
 			"latitude":  ride.Dropoff.Latitude,
 			"longitude": ride.Dropoff.Longitude,
 		},
-		"date":  time.Now().Format("2006-01-02"),
-		"seats": 2,
+		"date":  testDateStr,
+		"seats": 1,
 	})
 
 	req, _ := http.NewRequest("POST", "/user/search-ride", bytes.NewBuffer(requestBody))
@@ -63,14 +67,62 @@ func TestSearchRides_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 
-	// Assert response
-	assert.Equal(t, http.StatusOK, w.Code)
+	// ✅ Assert response
+
 	var response map[string][]models.Ride
 	err = json.Unmarshal(w.Body.Bytes(), &response)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(response["rides"]), 1)
 
-	// Clean up
+	// ✅ Cleanup
+	_, _ = collection.DeleteOne(context.TODO(), bson.M{"_id": ride.ID})
+}
+
+func TestSearchRides_SeatFilter(t *testing.T) {
+	router := setupSearchRideRouter()
+
+	today := time.Now().Truncate(24 * time.Hour)
+	ride := models.Ride{
+		ID:        primitive.NewObjectID(),
+		DriverID:  primitive.NewObjectID(),
+		Pickup:    models.Location{Latitude: 40.7128, Longitude: -74.0060, Address: "NYC"},
+		Dropoff:   models.Location{Latitude: 40.7306, Longitude: -73.9352, Address: "Brooklyn"},
+		Status:    models.StatusOpen,
+		Price:     25,
+		Seats:     2,
+		Date:      today,
+		CreatedAt: time.Now(),
+	}
+	collection := config.GetCollection("rides")
+	_, err := collection.InsertOne(context.TODO(), ride)
+	assert.NoError(t, err)
+
+	// Requesting more seats than available
+	requestBody, _ := json.Marshal(map[string]interface{}{
+		"from": map[string]interface{}{
+			"latitude":  ride.Pickup.Latitude,
+			"longitude": ride.Pickup.Longitude,
+		},
+		"to": map[string]interface{}{
+			"latitude":  ride.Dropoff.Latitude,
+			"longitude": ride.Dropoff.Longitude,
+		},
+		"date":  today.Format("2006-01-02"),
+		"seats": 5,
+	})
+
+	req, _ := http.NewRequest("POST", "/user/search-ride", bytes.NewBuffer(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var response map[string][]models.Ride
+	err = json.Unmarshal(w.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Len(t, response["rides"], 0)
+
 	_, _ = collection.DeleteOne(context.TODO(), bson.M{"_id": ride.ID})
 }
 
