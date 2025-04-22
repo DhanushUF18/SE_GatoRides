@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import ProvideRide from '../ProvideRide';
 import AuthContext from '../../context/AuthContext';
 import RideContext from '../../context/RideContext';
@@ -17,11 +18,13 @@ describe('ProvideRide Component', () => {
 
   const renderComponent = () => {
     return render(
-      <AuthContext.Provider value={{ user: mockUser }}>
-        <RideContext.Provider value={{ setRidePayload: mockSetRidePayload }}>
-          <ProvideRide />
-        </RideContext.Provider>
-      </AuthContext.Provider>
+      <BrowserRouter>
+        <AuthContext.Provider value={{ user: mockUser }}>
+          <RideContext.Provider value={{ setRidePayload: mockSetRidePayload }}>
+            <ProvideRide />
+          </RideContext.Provider>
+        </AuthContext.Provider>
+      </BrowserRouter>
     );
   };
 
@@ -30,7 +33,7 @@ describe('ProvideRide Component', () => {
     expect(screen.getByPlaceholderText('Enter pickup location')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter dropoff address')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter price')).toBeInTheDocument();
-    expect(screen.getByText('Submit Ride Request')).toBeInTheDocument();
+    expect(screen.getByText('Provide Ride')).toBeInTheDocument(); // Updated button text
   });
 
   test('allows input changes', () => {
@@ -43,38 +46,42 @@ describe('ProvideRide Component', () => {
     const dropoffInput = screen.getByPlaceholderText('Enter dropoff address');
     fireEvent.change(dropoffInput, { target: { value: 'New Dropoff Location' } });
     expect(dropoffInput.value).toBe('New Dropoff Location');
+
+    const seatsInput = screen.getByPlaceholderText('Enter number of available seats');
+    fireEvent.change(seatsInput, { target: { value: '4' } });
+    expect(seatsInput.value).toBe('4');
   });
 
-
-
-// Mock axios
-jest.mock('axios');
-
-test('submits ride request successfully', async () => {
+  test('submits ride request successfully', async () => {
     render(
-      <AuthContext.Provider value={{ user: { token: 'test-token', location: { address: '123 Test St' } } }}>
-        <RideContext.Provider value={{ setRidePayload: jest.fn() }}>
-          <ProvideRide />
-        </RideContext.Provider>
-      </AuthContext.Provider>
+      <BrowserRouter>
+        <AuthContext.Provider value={{ user: { token: 'test-token', location: { address: '123 Test St' } } }}>
+          <RideContext.Provider value={{ setRidePayload: jest.fn() }}>
+            <ProvideRide />
+          </RideContext.Provider>
+        </AuthContext.Provider>
+      </BrowserRouter>
     );
 
-  fireEvent.change(screen.getByPlaceholderText('Enter pickup location'), {
-    target: { value: 'New Pickup' }
-  });
-  fireEvent.change(screen.getByPlaceholderText('Enter dropoff address'), {
-    target: { value: 'New Dropoff' }
-  });
-  fireEvent.change(screen.getByPlaceholderText('Enter price'), {
-    target: { value: '20' }
-  });
-  const dateInput = screen.getByPlaceholderText('Enter date');
-  fireEvent.change(dateInput, { target: { value: '2025-04-01' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter pickup location'), {
+      target: { value: 'New Pickup' }
+    });
+    fireEvent.change(screen.getByPlaceholderText('Enter dropoff address'), {
+      target: { value: 'New Dropoff' }
+    });
+    fireEvent.change(screen.getByPlaceholderText('Enter price'), {
+      target: { value: '20' }
+    });
+    fireEvent.change(screen.getByPlaceholderText('Enter number of available seats'), {
+      target: { value: '4' }
+    });
+    const dateInput = screen.getByPlaceholderText('Enter date');
+    fireEvent.change(dateInput, { target: { value: '2025-04-01' } });
 
-  fireEvent.click(screen.getByText('Submit Ride Request'));
+    fireEvent.click(screen.getByText('Provide Ride')); // Updated button text
 
-  await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
-});
+    await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
+  });
 
   test('handles API error on submit', async () => {
     axios.post.mockRejectedValue({ response: { data: { message: 'Error occurred' } } });
@@ -83,12 +90,14 @@ test('submits ride request successfully', async () => {
     fireEvent.change(screen.getByPlaceholderText('Enter pickup location'), { target: { value: 'New Pickup' } });
     fireEvent.change(screen.getByPlaceholderText('Enter dropoff address'), { target: { value: 'New Dropoff' } });
     fireEvent.change(screen.getByPlaceholderText('Enter price'), { target: { value: '20' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter number of available seats'), {
+      target: { value: '4' }
+    });
     fireEvent.change(screen.getByPlaceholderText('Enter date'), { 
-        target: { value: '2025-04-01' } 
-      });
-      
+      target: { value: '2025-04-01' } 
+    });
 
-    fireEvent.click(screen.getByText('Submit Ride Request'));
+    fireEvent.click(screen.getByText('Provide Ride')); // Updated button text
 
     await waitFor(() => expect(axios.post).toHaveBeenCalledTimes(1));
     expect(mockSetRidePayload).not.toHaveBeenCalled();

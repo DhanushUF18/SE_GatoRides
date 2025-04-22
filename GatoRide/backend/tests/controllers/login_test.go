@@ -72,4 +72,43 @@ func TestLogin(t *testing.T) {
 		assert.True(t, exists)
 
 	})
+
+	t.Run("Login with incorrect password", func(t *testing.T) {
+		// Create a test user
+		testUser := models.User{
+			Username:   "shahid_wrongpass",
+			Email:      "wrongpass@test.com",
+			Password:   "CorrectPassword",
+			IsVerified: true,
+		}
+
+		// Clean up before and after test
+		cleanupTestUser(t, testUser.Email, testUser.Username)
+		defer cleanupTestUser(t, testUser.Email, testUser.Username)
+		cleanupUserSessions(t, testUser.ID.Hex())
+
+		// Insert test user into DB
+		collection := config.GetCollection("users")
+		hashedPassword, _ := utils.HashPassword(testUser.Password)
+		testUser.Password = hashedPassword
+		testUser.ID = primitive.NewObjectID()
+		_, err := collection.InsertOne(context.TODO(), testUser)
+		assert.NoError(t, err)
+
+		// Create login request with incorrect password
+		loginData := map[string]string{
+			"email":    testUser.Email,
+			"password": "WrongPassword",
+		}
+
+		jsonData, _ := json.Marshal(loginData)
+		req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+		req.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, req)
+
+		// Assertions
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
 }

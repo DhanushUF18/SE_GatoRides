@@ -30,8 +30,6 @@ func SetupRoutes() *gin.Engine {
 		protected.POST("/user/rides", controllers.GetUserRides)
 		protected.GET("/home", controllers.HomeHandler)
 
-		// protected.GET("/rides/feed", controllers.FetchRideFeed)
-
 	}
 
 	return r
