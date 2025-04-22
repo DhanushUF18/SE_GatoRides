@@ -10,7 +10,8 @@ GatoRides is a car ride-sharing platform that enables users to find and provide 
 - Search available rides
 - Profile management
 - Route visualization
-
+- Console Logs
+- scheduler for ride status updation based on given date and time of the ride
 ## Prerequisites
 
 - Node.js v16+ 
@@ -45,13 +46,6 @@ Frontend (.env):
 REACT_APP_API_BASE_URL=http://localhost:5001
 ```
 
-Backend (.env):
-```
-PORT=5001
-MONGO_URI=mongodb+srv://smohammad:iCPpHajYSS6WNsGa@cluster0.yeggn.mongodb.net/gatorides?retryWrites=true&w=majority&appName=Cluster0
-JWT_SECRET=mysecretkey
-```
-
 ## Running the Application
 
 1. Start Backend Server:
@@ -66,7 +60,6 @@ cd GatoRide/frontend
 npm start
 ```
 
-The application will be available at http://localhost:3000
 
 ## Testing
 
