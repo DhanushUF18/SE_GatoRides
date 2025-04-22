@@ -1,7 +1,9 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
 import RideMap from '../RideMap';
+import AuthContext from '../../context/AuthContext';
 import '@testing-library/jest-dom';
 
 // Mock leaflet to prevent errors
@@ -38,6 +40,23 @@ const mockLocationData = {
     }]
 };
 
+// Mock user data
+const mockUser = {
+    token: 'mock-token',
+    // Add other user properties as needed
+};
+
+// Updated helper function to wrap component with both Router and AuthContext
+const renderWithRouter = (component) => {
+    return render(
+        <AuthContext.Provider value={{ user: mockUser }}>
+            <BrowserRouter>
+                {component}
+            </BrowserRouter>
+        </AuthContext.Provider>
+    );
+};
+
 describe('RideMap Component', () => {
     beforeEach(() => {
         global.fetch = jest.fn();
@@ -45,7 +64,7 @@ describe('RideMap Component', () => {
     });
 
     it('renders the map component with form elements', () => {
-        render(<RideMap />);
+        renderWithRouter(<RideMap />);
         
         expect(screen.getByLabelText(/from:/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/to:/i)).toBeInTheDocument();
@@ -62,7 +81,7 @@ describe('RideMap Component', () => {
                 json: () => Promise.resolve(mockLocationData.university)
             });
 
-        render(<RideMap />);
+        renderWithRouter(<RideMap />);
 
         await userEvent.type(screen.getByLabelText(/from:/i), 'Gainesville');
         await userEvent.type(screen.getByLabelText(/to:/i), 'University of Florida');
@@ -82,7 +101,7 @@ describe('RideMap Component', () => {
             json: () => Promise.resolve([])
         });
 
-        render(<RideMap />);
+        renderWithRouter(<RideMap />);
 
         await userEvent.type(screen.getByLabelText(/from:/i), 'NonexistentLocation');
         await userEvent.type(screen.getByLabelText(/to:/i), 'Somewhere');
@@ -97,7 +116,7 @@ describe('RideMap Component', () => {
     it('handles network errors during location search', async () => {
         global.fetch.mockRejectedValueOnce(new Error('Network error'));
 
-        render(<RideMap />);
+        renderWithRouter(<RideMap />);
 
         await userEvent.type(screen.getByLabelText(/from:/i), 'Gainesville');
         await userEvent.type(screen.getByLabelText(/to:/i), 'University');
@@ -110,7 +129,7 @@ describe('RideMap Component', () => {
 
     it('prevents form submission with empty inputs', async () => {
         const user = userEvent.setup();
-        render(<RideMap />);
+        renderWithRouter(<RideMap />);
         
         const searchButton = screen.getByRole('button', { name: /search route/i });
         await user.click(searchButton);
@@ -129,7 +148,7 @@ describe('RideMap Component', () => {
                 json: () => Promise.resolve(mockLocationData.university)
             });
 
-        render(<RideMap />);
+        renderWithRouter(<RideMap />);
         const fromInput = screen.getByLabelText(/from:/i);
         const toInput = screen.getByLabelText(/to:/i);
         const searchButton = screen.getByRole('button', { name: /search route/i });

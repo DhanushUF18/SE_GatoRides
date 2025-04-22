@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // Add this import
 import '../styles.css';  // Import the global styles
 import axios from 'axios';
 
 const SignupForm = () => {
+  const navigate = useNavigate();  // Add this line
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -83,19 +85,20 @@ const handleLocationSelect = (location) => {
       }
     };
 
-    console.log("🔹 Sending Payload:", JSON.stringify(payload, null, 2));
+    // console.log("🔹 Sending Payload:", JSON.stringify(payload, null, 2));
 
     try {
       const response = await axios.post("http://localhost:5001/signup", payload, {
         headers: { "Content-Type": "application/json" }
       });
 
-      console.log("✅ Signup Response:", response.data);
+      //console.log("✅ Signup Response:", response.data);
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        console.log("🔑 Token stored in localStorage:", response.data.token);
+        //console.log("🔑 Token stored in localStorage:", response.data.token);
       }
-      alert("Sign up successful!");
+      alert("Sign up successful! Please verify email");
+      navigate('/login');  // Add this line to redirect to login page
     } catch (error) {
       console.error("❌ Signup Error:", error.response?.data || error);
       alert(`Error during signup: ${error.response?.data?.error || "Unknown error"}`);
@@ -103,7 +106,7 @@ const handleLocationSelect = (location) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="signup-form">
+    <form onSubmit={handleSubmit} className="signup-form" role="form">
       <h2>Join GatoRides</h2>
       <p>Create your account to start ride-sharing.</p>
       <input type="text" name="name" placeholder="Name" onChange={handleChange} required />

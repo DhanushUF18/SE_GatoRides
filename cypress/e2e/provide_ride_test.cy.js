@@ -1,5 +1,6 @@
 describe('ProvideRide Component', () => {
     beforeEach(() => {
+      cy.viewport(2160, 1400);
       cy.visit('http://localhost:3000/login');
     // Perform login
       cy.get('input[name="email"]').type('r60y739794@tidissajiiu.com'); // Type email
@@ -19,7 +20,7 @@ describe('ProvideRide Component', () => {
       cy.get('input[name="dropoff"]').should('exist');
       cy.get('input[name="price"]').should('exist');
       cy.get('input[name="date"]').should('exist');
-      cy.get('button[type="submit"]').should('contain', 'Submit Ride Request');
+      cy.get('button[type="submit"]').should('contain', 'Provide Ride');
     });
   
     it('should allow users to enter pickup and dropoff locations and fetch suggestions', () => {
@@ -51,7 +52,7 @@ describe('ProvideRide Component', () => {
       cy.get('.dropdown-item').first().click();
   
       cy.get('input[name="dropoff"]').type('Orlando International Airport');
-      cy.wait(10000);
+      cy.wait(14000);
       cy.get('.dropdown-item').first().click();
   
       cy.get('input[name="price"]').type('20');

@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import axios from 'axios';  // Ensure axios is imported
 import AuthContext from '../context/AuthContext';
 // import { useLocation } from 'react-router-dom';
@@ -6,6 +7,7 @@ import '../styles.css';
 import RideContext from '../context/RideContext';
 
 const ProvideRide = () => {
+  const navigate = useNavigate(); // Add this line
   const { user } = useContext(AuthContext); // Fetch user data from context
   const { setRidePayload } = useContext(RideContext); // Use setRidePayload from RideContext
 
@@ -14,6 +16,7 @@ const ProvideRide = () => {
     pickup: { address: '', latitude: '', longitude: '' }, // Initialize with empty lat/lng
     dropoff: { address: '', latitude: '', longitude: '' },
     price: '',
+    seats: '',
     date: '', // Add date field
   });
 
@@ -147,6 +150,14 @@ const ProvideRide = () => {
     }));
   };
 
+  // Add this handler after the handleChange function
+  const handleSeatsChange = (e) => {
+    setRideDetails((prevDetails) => ({
+      ...prevDetails,
+      seats: e.target.value,
+    }));
+  };
+
   // Handle date input change
   const handleDateChange = (e) => {
     setRideDetails((prevDetails) => ({
@@ -155,20 +166,45 @@ const ProvideRide = () => {
     }));
   };
 
-  // Submit ride request
+  // Add this function after the other utility functions
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in km
+  };
+
+  // Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Get token from user context
-    const token = user?.token; 
-    //console.log("Token:", token);
-
+    const token = user?.token;
     if (!token) {
         alert("User is not authenticated");
         return;
     }
 
-    // Ensure latitude and longitude are numbers
+    // Check if user is within 5km of the pickup location
+    if (user?.location?.latitude && user?.location?.longitude) {
+      const distance = calculateDistance(
+        parseFloat(user.location.latitude),
+        parseFloat(user.location.longitude),
+        parseFloat(rideDetails.pickup.latitude),
+        parseFloat(rideDetails.pickup.longitude)
+      );
+
+      if (distance > 5) {
+        alert("You can only provide rides within 5km of your registered location.");
+        return;
+      }
+    }
+
+    const formattedDate = new Date(rideDetails.date).toISOString();
     const payload = {
         pickup: {
             ...rideDetails.pickup,
@@ -181,25 +217,39 @@ const ProvideRide = () => {
             longitude: parseFloat(rideDetails.dropoff.longitude),
         },
         price: parseFloat(rideDetails.price),
-        date: rideDetails.date,
+        seats: parseInt(rideDetails.seats),
+        date: formattedDate,
+        providerId: user.token,
+        status: 'active',
+        driverLocation: {
+            latitude: user?.location?.latitude,
+            longitude: user?.location?.longitude
+        }
     };
 
     try {
         const response = await axios.post("http://localhost:5001/user/provide-ride", payload, {
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`  // Pass token in Authorization header
+                "Authorization": `Bearer ${token}`
             }
         });
 
-        console.log("✅ Ride Provided:", response.data);
-        alert("Ride provided successfully!");
+        // Store ride ID from response
+        const rideId = response.data.ride_id;
+        // console.log("✅ Ride Provided:", response.data);
+        
+        // Store complete ride data in context
+        setRidePayload({
+            ...payload,
+            ride_id: rideId
+        });
 
-        // Pass the payload back to the Dashboard
-        setRidePayload(payload);
+        alert(`Ride provided successfully!`);
+        navigate('/'); // Redirect to home page
     } catch (error) {
         console.error("❌ Error:", error.response?.data || error);
-        alert(`Error: ${error.response?.data?.message || "Unknown error"}`);
+        alert(`Error: ${error.response?.data?.message || "Failed to provide ride"}`);
     }
   };
 
@@ -268,6 +318,18 @@ const ProvideRide = () => {
           required
         />
 
+        <h3>Available Seats</h3>
+        <input
+          type="number"
+          name="seats"
+          placeholder="Enter number of available seats"
+          value={rideDetails.seats}
+          onChange={handleSeatsChange}
+          min="1"
+          max="8"
+          required
+        />
+
         <h3>Date</h3>
         <input
           type="date"
@@ -278,7 +340,7 @@ const ProvideRide = () => {
           required
         />
 
-        <button type="submit">Submit Ride Request</button>
+        <button type="submit">Provide Ride</button>
       </form>
     </div>
   );
